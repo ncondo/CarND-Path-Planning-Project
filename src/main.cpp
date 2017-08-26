@@ -266,22 +266,21 @@ int main() {
                 // or we could try to change lanes
                 //ref_vel = 29.5;
                 too_close = true;
-
+                // brute force lane change; need to update
                 if (lane > 0) {
                   lane = 0;
                 }
               }
             }
           }
-
+          // if we are too close to the car in front of us slow down
           if (too_close) {
             ref_vel -= .224;
           }
+          // increase speed to target speed when there is free space ahead
           else if(ref_vel < 49.5) {
             ref_vel += .224;
           }
-
-        	// TODO: define a path made up of (x,y) points that the car will visit sequentially every .02 seconds
 
           // Create a list of widely spaced (x,y) waypoints, evenly spaced at 30m
           vector<double> ptsx;
@@ -293,6 +292,8 @@ int main() {
           double ref_y = car_y;
           double ref_yaw = deg2rad(car_yaw);
 
+          // if we don't have previous path to build on calculate previous position
+          // by taking one 'step' back. This will create a smoother trajectory by mathing yaw.
           if (prev_size < 2) {
             // use two points that make the path tangent to the car
             double prev_car_x = car_x - cos(car_yaw);
