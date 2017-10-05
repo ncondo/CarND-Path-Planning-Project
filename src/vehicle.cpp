@@ -6,6 +6,8 @@
 #include "vehicle.h"
 
 
+double Vehicle::SAFE_DISTANCE = 20.0;
+
 Vehicle::Vehicle(int id, double x_map, double y_map, double x_vel,
                  double y_vel, double s_frenet, double d_frenet) {
 
@@ -33,8 +35,51 @@ double Vehicle::get_yaw(double x_vel, double y_vel) {
   return (abs(angle) < 0.1) ? 0.0 : angle;
 }
 
+double Vehicle::deg2rad(double angle) {
+  return yaw * M_PI / 180;
+}
+
+double Vehicle::rad2deg(double angle) {
+  return angle * 180 / M_PI;
+}
+
 int Vehicle::get_lane(double d_frenet) {
   return (int) d_frenet / Road::LANE_WIDTH;
+}
+
+void Vehicle::update_params(double x_map, double y_map, double yaw, double s_frenet,
+                            double d_frenet, double speed, double diff) {
+  this->x_map = x_map;
+  this->y_map = y_map;
+  this->yaw = deg2rad(yaw);
+  update_acc(speed*cos(this->yaw), speed*sin(this->yaw), diff);
+  this->s_frenet = s_frenet;
+  this->d_frenet = d_frenet;
+}
+
+void Vehicle::update_acc(double x_vel, double y_vel, double diff) {
+  this->x_acc = (x_vel - this->x_vel) / diff;
+  if (this->x_acc < 0.01) {
+    this->x_acc = 0.0;
+  }
+
+  this->y_acc = (y_vel - this->y_vel) / diff;
+  if (this->y_acc < 0.01) {
+    this->y_acc = 0.0;
+  }
+  this->x_vel = x_vel;
+  this->y_vel = y_vel;
+}
+
+void Vehicle::update_yaw(double x_map, double y_map, double x_vel, double y_vel,
+                         double s_frenet, double d_frenet, double diff) {
+  this->yaw = get_yaw(y_vel, x_vel);
+  this->x_map = x_map;
+  this->y_map = y_map;
+  update_acc(x_vel, y_vel, diff);
+  this->s_frenet = s_frenet;
+  this->d_frenet = d_frenet;
+  this->lane = get_lane(d_frenet);
 }
 
 void Vehicle::increment(double dt) {
@@ -58,6 +103,20 @@ void Vehicle::increment(double dt) {
   Frenet frenet = Road::getFrenet(this->x_map, this->y_map, this->yaw);
   this->s_frenet = frenet.s;
   this->d_frenet = frenet.d;
+}
+
+bool Vehicle::is_ahead(Prediction pred, int lane) {
+  return (pred.lane == lane) && pred.get_distance(x_map, y_map, s_frenet) >= 0;
+}
+
+bool Vehicle::is_behind(Prediction pred, int lane) {
+  double distance = -pred.get_distance(x_map, y_map, s_frenet);
+  return (pred.lane == lane) && (distance >= 0 && distance < 2*SAFE_DISTANCE);
+}
+
+bool Vehicle::is_close(Prediction pred, int lane) {
+  double distance = -pred.get_distance(x_map, y_map, s_frenet);
+  return (pred.lane == lane) && distance >= 0 && (distance < SAFE_DISTANCE);
 }
 
 Prediction Vehicle::state_at(double dt) {

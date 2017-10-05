@@ -20,6 +20,7 @@ class Road {
 public:
   static double MAX_S;
   static double LANE_WIDTH;
+  static int NUM_LANES;
 
   static void add_waypoints(double x, double y, double s, double d_x, double d_y);
   static void init();

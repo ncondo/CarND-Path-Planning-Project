@@ -5,6 +5,7 @@
 
 double Road::MAX_S = 6945.554;
 double Road::LANE_WIDTH = 4.0;
+int Road::NUM_LANES = 3;
 std::vector<double> Road::map_waypoints_x = std::vector<double>();
 std::vector<double> Road::map_waypoints_y = std::vector<double>();
 std::vector<double> Road::map_waypoints_s = std::vector<double>();
