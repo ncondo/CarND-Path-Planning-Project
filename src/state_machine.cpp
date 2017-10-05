@@ -11,6 +11,10 @@ StateMachine::StateMachine(Vehicle& ego) : ego(ego) {
 
 StateMachine::~StateMachine() {};
 
+double StateMachine::get_expected_velocity() {
+  return ref_vel;
+}
+
 void StateMachine::update_state(std::map<int, std::vector<Prediction> > predictions) {
   state = get_next_state(predictions);
 }

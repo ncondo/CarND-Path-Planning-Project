@@ -2,7 +2,6 @@
 #define ROAD_H
 
 #include <vector>
-
 #include "spline.h"
 
 
@@ -27,6 +26,8 @@ public:
 
   static Frenet getFrenet(double x, double y, double theta);
   static Cartesian getXY(double s, double d);
+  static double deg2rad(double angle);
+  static double rad2deg(double angle);
 
 private:
   static tk::spline s_x, s_y, s_dx, s_dy;

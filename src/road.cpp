@@ -98,6 +98,14 @@ Cartesian Road::getXY(double s, double d) {
   return coord;
 }
 
+double Road::deg2rad(double angle) {
+  return angle * M_PI / 180;
+}
+
+double Road::rad2deg(double angle) {
+  return angle * 180 / M_PI;
+}
+
 int Road::ClosestWaypoint(double x, double y) {
   double closestLen = 100000; //large number
   int closestWaypoint = 0;

@@ -24,23 +24,23 @@ Vehicle::Vehicle(int id, double x_map, double y_map, double x_vel,
   this->lane = get_lane(d_frenet);
 }
 
+Vehicle::Vehicle(int id) {
+  this->id = id;
+}
+
 Vehicle::~Vehicle() {}
 
 double Vehicle::get_velocity() {
   return sqrt(this->x_vel*this->x_vel + this->y_vel*this->y_vel);
 }
 
+bool Vehicle::should_predict() {
+  return true;
+}
+
 double Vehicle::get_yaw(double x_vel, double y_vel) {
   double angle = atan2(y_vel, x_vel);
   return (abs(angle) < 0.1) ? 0.0 : angle;
-}
-
-double Vehicle::deg2rad(double angle) {
-  return yaw * M_PI / 180;
-}
-
-double Vehicle::rad2deg(double angle) {
-  return angle * 180 / M_PI;
 }
 
 int Vehicle::get_lane(double d_frenet) {
@@ -51,7 +51,7 @@ void Vehicle::update_params(double x_map, double y_map, double yaw, double s_fre
                             double d_frenet, double speed, double diff) {
   this->x_map = x_map;
   this->y_map = y_map;
-  this->yaw = deg2rad(yaw);
+  this->yaw = Road::deg2rad(yaw);
   update_acc(speed*cos(this->yaw), speed*sin(this->yaw), diff);
   this->s_frenet = s_frenet;
   this->d_frenet = d_frenet;

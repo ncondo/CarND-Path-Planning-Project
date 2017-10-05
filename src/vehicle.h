@@ -50,7 +50,9 @@ public:
   double yaw;
   double x_acc;
   double y_acc;
-  int lane;
+  int lane = 1;
+
+  Vehicle(int id);
 
   Vehicle(int id, double x_map, double y_map, double x_vel,
           double y_vel, double s_frenet, double d_frenet);
@@ -59,11 +61,9 @@ public:
 
   double get_velocity();
 
+  bool should_predict();
+
   double get_yaw(double x_vel, double y_vel);
-
-  double deg2rad(double angle);
-
-  double rad2deg(double angle);
 
   int get_lane(double d_frenet);
 
@@ -85,7 +85,7 @@ public:
 
   Prediction state_at(double dt);
 
-  std::vector<Prediction> generate_predictions(double interval, int horizon);
+  std::vector<Prediction> generate_predictions(double interval, int horizon = 10);
 };
 
 #endif
