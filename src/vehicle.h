@@ -39,7 +39,6 @@ struct Prediction {
 
 class Vehicle {
 public:
-  static double SAFE_DISTANCE;
   int id;
   double x_map;
   double y_map;

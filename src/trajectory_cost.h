@@ -61,7 +61,7 @@ private:
   const int DANGER = 3*pow(10, 5);
   const int COMFORT = pow(10, 4);
   const int EFFICIENCY = pow(10, 3);
-  const double DESIRED_BUFFER = Vehicle::SAFE_DISTANCE*2;
+  const double DESIRED_BUFFER = 20.0;
   const int PLANNING_HORIZON = 1;
   const double PRED_INTERVAL = 0.15;
   const double MANEUVER = 4.0;

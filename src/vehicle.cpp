@@ -6,8 +6,6 @@
 #include "vehicle.h"
 
 
-double Vehicle::SAFE_DISTANCE = 20.0;
-
 Vehicle::Vehicle(int id, double x_map, double y_map, double x_vel,
                  double y_vel, double s_frenet, double d_frenet) {
 
@@ -111,12 +109,12 @@ bool Vehicle::is_ahead(Prediction pred, int lane) {
 
 bool Vehicle::is_behind(Prediction pred, int lane) {
   double distance = -pred.get_distance(x_map, y_map, s_frenet);
-  return (pred.lane == lane) && (distance >= 0 && distance < 2*SAFE_DISTANCE);
+  return (pred.lane == lane) && (distance >= 0);
 }
 
 bool Vehicle::is_close(Prediction pred, int lane) {
   double distance = -pred.get_distance(x_map, y_map, s_frenet);
-  return (pred.lane == lane) && distance >= 0 && (distance < SAFE_DISTANCE);
+  return (pred.lane == lane) && (distance >= 0) && (distance < 20);
 }
 
 Prediction Vehicle::state_at(double dt) {

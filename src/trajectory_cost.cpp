@@ -51,7 +51,7 @@ double TrajectoryCost::buffer_cost(std::vector<Snapshot> trajectory,
                                    std::map<int, std::vector<Prediction> > predictions,
                                    TrajectoryData data) const {
   double closest = data.actual_closest_approach;
-  if (closest < Vehicle::SAFE_DISTANCE/2) {
+  if (closest < DESIRED_BUFFER) {
     return 3*DANGER;
   }
 
