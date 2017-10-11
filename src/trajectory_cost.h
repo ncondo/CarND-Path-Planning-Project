@@ -50,6 +50,7 @@ private:
   struct TrajectoryData {
     int proposed_lane;
     int current_lane;
+    int end_lanes_from_goal;
     double avg_speed;
     double prop_closest_approach;
     double actual_closest_approach;
@@ -59,11 +60,12 @@ private:
   double MAX_SPEED;
   const int COLLISION = pow(10, 6);
   const int DANGER = 3*pow(10, 5);
-  const int COMFORT = pow(10, 4);
-  const int EFFICIENCY = pow(10, 3);
+  const int COMFORT = pow(10, 2);
+  const int EFFICIENCY = 3*pow(10, 4);
   const double DESIRED_BUFFER = 20.0;
   const int PLANNING_HORIZON = 1;
   const double PRED_INTERVAL = 0.15;
+  const double GOAL_LANE = 1;
   const double MANEUVER = 4.0;
   const double OBSERVED_DISTANCE = 65;
   const double MAX_DISTANCE = 999999;

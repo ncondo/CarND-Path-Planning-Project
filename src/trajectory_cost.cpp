@@ -13,13 +13,18 @@ TrajectoryCost::~TrajectoryCost() {}
 double TrajectoryCost::change_lane_cost(std::vector<Snapshot> trajectory,
                                         std::map<int, std::vector<Prediction> > predictions,
                                         TrajectoryData data) const {
-  if (data.proposed_lane != data.current_lane) {
-    if (data.proposed_lane == 1) {
-      return 0;
-    }
-    return COMFORT;
+  int proposed_lane = data.proposed_lane;
+  int cur_lane = trajectory[0].lane;
+  int diff = data.end_lanes_from_goal;
+  double cost = 0;
+  if (proposed_lane == cur_lane) {
+    return 0;
   }
-  return 0;
+  else if (diff == 0) {
+    return COMFORT / 2;
+  }
+
+  return COMFORT;
 }
 
 double TrajectoryCost::inefficiency_cost(std::vector<Snapshot> trajectory,
@@ -85,8 +90,8 @@ double TrajectoryCost::calculate_cost(double car_s, double ref_vel, std::vector<
   double ineff_cost = inefficiency_cost(trajectory, predictions, data);
   double coll_cost = collision_cost(trajectory, predictions, data);
   double buff_cost = buffer_cost(trajectory, predictions, data);
-  double free_cost = free_line_cost(trajectory, predictions, data);
-  double total_cost = change_cost + ineff_cost + coll_cost + buff_cost + free_cost;
+  //double free_cost = free_line_cost(trajectory, predictions, data);
+  double total_cost = change_cost + ineff_cost + coll_cost + buff_cost;
 
   return total_cost;
 }
@@ -99,10 +104,12 @@ TrajectoryCost::TrajectoryData TrajectoryCost::get_helper_data(double car_s, dou
   Snapshot current_snapshot = trajectory[0];
   Snapshot first = trajectory[1];
   Snapshot last = trajectory[trajectory.size()-1];
+  int end_lanes_from_goal = abs(GOAL_LANE - last.lane);
 
   double dt = trajectory.size()*PRED_INTERVAL;
   data.current_lane = first.lane;
   data.proposed_lane = last.proposed_lane;
+  data.end_lanes_from_goal = end_lanes_from_goal;
   data.avg_speed = (last.get_speed()*dt - current_snapshot.get_speed()) / dt;
   data.prop_closest_approach = MAX_DISTANCE;
   data.actual_closest_approach = MAX_DISTANCE;
