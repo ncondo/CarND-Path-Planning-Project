@@ -16,7 +16,7 @@ public:
 
   Vehicle& ego;
   double car_s;
-  const double PRED_INTERVAL = 0.2;
+  const double PRED_INTERVAL = 0.15;
 
   double get_expected_velocity();
 

@@ -58,12 +58,12 @@ private:
 
   double MAX_SPEED;
   const int COLLISION = pow(10, 6);
-  const int DANGER = pow(10, 5);
+  const int DANGER = 3*pow(10, 5);
   const int COMFORT = pow(10, 4);
   const int EFFICIENCY = pow(10, 3);
   const double DESIRED_BUFFER = Vehicle::SAFE_DISTANCE*2;
-  const int PLANNING_HORIZON = 2;
-  const double PRED_INTERVAL = 0.2;
+  const int PLANNING_HORIZON = 1;
+  const double PRED_INTERVAL = 0.15;
   const double MANEUVER = 4.0;
   const double OBSERVED_DISTANCE = 65;
   const double MAX_DISTANCE = 999999;
@@ -92,7 +92,7 @@ private:
                                  std::map<int, std::vector<Prediction> > predictions,
                                  CarState state);
 
-  bool check_collision(double car_s, double ref_speed, Snapshot snapshot,
+  bool will_collide_with(double car_s, double ref_speed, Snapshot snapshot,
                        Prediction s_now, CarState state, bool space);
 
   std::map<int, std::vector<Prediction> > filter_predictions_by_lane(

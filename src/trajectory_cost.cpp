@@ -131,7 +131,7 @@ TrajectoryCost::TrajectoryData TrajectoryCost::get_helper_data(double car_s, dou
       Prediction pred = pair.second[i];
       double dist = -pred.get_distance(snapshot.x_map, snapshot.y_map, snapshot.s_frenet);
       if (check_collisions) {
-        bool vehicle_collides = check_collision(car_s, ref_s, snapshot, pred, state,
+        bool vehicle_collides = will_collide_with(car_s, ref_s, snapshot, pred, state,
                                                 data.actual_closest_approach < MANEUVER);
         if (vehicle_collides) {
           data.collides.collision = true;
@@ -152,7 +152,7 @@ TrajectoryCost::TrajectoryData TrajectoryCost::get_helper_data(double car_s, dou
   return data;
 }
 
-bool TrajectoryCost::check_collision(double car_s, double ref_speed, Snapshot snapshot,
+bool TrajectoryCost::will_collide_with(double car_s, double ref_speed, Snapshot snapshot,
                                      Prediction s_now, CarState state, bool space) {
   double s_frenet = snapshot.s_frenet;
   double vel = snapshot.get_speed();
