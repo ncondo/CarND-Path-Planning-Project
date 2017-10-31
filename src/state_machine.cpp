@@ -50,7 +50,8 @@ CarState StateMachine::get_next_state(std::map<int, std::vector<Prediction> > pr
   double best_cost = 999999.0;
   CarState best_state;
   for (int i = 0; i < states.size(); i++) {
-    std::vector<Snapshot> trajectory = trajectory_for_state(states[i], predictions,
+    std::map<int, std::vector<Prediction> > predictions_copy = predictions;
+    std::vector<Snapshot> trajectory = trajectory_for_state(states[i], predictions_copy,
                                                             PRED_COUNT);
     double cost = trajectory_cost.calculate_cost(car_s, ref_vel, trajectory,
                                                  predictions, states[i]);

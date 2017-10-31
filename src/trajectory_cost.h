@@ -60,7 +60,7 @@ private:
   double MAX_SPEED;
   const int COLLISION = pow(10, 6);
   const int DANGER = 3*pow(10, 5);
-  const int COMFORT = pow(10, 2);
+  const int COMFORT = 0;//pow(10, 2);
   const int EFFICIENCY = 3*pow(10, 4);
   const double DESIRED_BUFFER = 20.0;
   const int PLANNING_HORIZON = 1;

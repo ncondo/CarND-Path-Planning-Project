@@ -14,17 +14,15 @@ double TrajectoryCost::change_lane_cost(std::vector<Snapshot> trajectory,
                                         std::map<int, std::vector<Prediction> > predictions,
                                         TrajectoryData data) const {
   int proposed_lane = data.proposed_lane;
-  int cur_lane = trajectory[0].lane;
-  int diff = data.end_lanes_from_goal;
-  double cost = 0;
-  if (proposed_lane == cur_lane) {
-    return 0;
-  }
-  else if (diff == 0) {
-    return COMFORT / 2;
+  int current_lane = trajectory[0].lane;
+  if (proposed_lane == current_lane) {
+    return 0.0;
   }
 
-  return COMFORT;
+  int diff = data.end_lanes_from_goal;
+  double multiplier = 1 - exp(-diff);
+
+  return multiplier*COMFORT;
 }
 
 double TrajectoryCost::inefficiency_cost(std::vector<Snapshot> trajectory,
@@ -36,37 +34,33 @@ double TrajectoryCost::inefficiency_cost(std::vector<Snapshot> trajectory,
   double pct = diff / target_speed;
   double multiplier = pow(pct, 2);
 
-  return 8*multiplier*EFFICIENCY;
+  return multiplier*EFFICIENCY;
 }
 
 double TrajectoryCost::collision_cost(std::vector<Snapshot> trajectory,
                                       std::map<int, std::vector<Prediction> > predictions,
                                       TrajectoryData data) const {
-  if (data.collides.collision) {
+  if (data.collides.collision == true) {
     double time_til_collision = data.collides.time_step;
     double exponent = pow(float(time_til_collision), 2);
     double mult = exp(-exponent);
 
     return mult*COLLISION;
   }
-  return 0;
+  return 0.0;
 }
 
 double TrajectoryCost::buffer_cost(std::vector<Snapshot> trajectory,
                                    std::map<int, std::vector<Prediction> > predictions,
                                    TrajectoryData data) const {
   double closest = data.actual_closest_approach;
-  if (closest < DESIRED_BUFFER) {
-    return 3*DANGER;
-  }
-
   if (closest > DESIRED_BUFFER) {
     return 0.0;
   }
 
   double multiplier = 1.0 - pow(closest/DESIRED_BUFFER, 2);
 
-  return 3*multiplier*DANGER;
+  return multiplier*DANGER;
 }
 
 double TrajectoryCost::free_line_cost(std::vector<Snapshot> trajectory,
@@ -110,7 +104,7 @@ TrajectoryCost::TrajectoryData TrajectoryCost::get_helper_data(double car_s, dou
   data.current_lane = first.lane;
   data.proposed_lane = last.proposed_lane;
   data.end_lanes_from_goal = end_lanes_from_goal;
-  data.avg_speed = (last.get_speed()*dt - current_snapshot.get_speed()) / dt;
+  data.avg_speed = (last.s_frenet - first.s_frenet) / dt;
   data.prop_closest_approach = MAX_DISTANCE;
   data.actual_closest_approach = MAX_DISTANCE;
   data.collides = Collider();
