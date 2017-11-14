@@ -169,8 +169,7 @@ int main() {
 
   // Waypoint map to read from
   string map_file_ = "../data/highway_map.csv";
-  // Bosch challenge map
-  //string map_file_ = "../data/highway_map_bosch1.csv";
+
   // The max s value before wrapping around the track back to 0
   double max_s = 6945.554;
 
@@ -246,13 +245,14 @@ int main() {
             car_s = end_path_s;
           }
 
+          // Set flags for possible actions
           bool slow_down = false;
           bool change_lane_left = true;
           bool change_lane_right = true;
 
           // Find ref_v to use
           for (int i = 0; i < sensor_fusion.size(); i++) {
-            // Car is in my lane
+            // Get info of vehicle from sensor fusion data
             int lane_other = getLane(sensor_fusion[i][6]);
             double vx = sensor_fusion[i][3];
             double vy = sensor_fusion[i][4];
@@ -260,43 +260,59 @@ int main() {
             double check_car_s = sensor_fusion[i][5];
             // If using previous points project s value out
             check_car_s += ((double)prev_size*.02*check_speed);
+            // Current vehicle being processed is in left lane
             if (lane_other == 0) {
+              // If I'm in same lane check distance and possibly set flag to slow down
               if (lane == lane_other) {
+                // Can't changle lanes left if currently in left lane
+                change_lane_left = false;
                 if ((check_car_s > car_s) && ((check_car_s-car_s) < 30)) {
                   slow_down = true;
                 }
               }
+              // I'm in middle lane - check if vehicle is too close to me to change to left lane
               else if (lane == 1) {
                 if (abs(check_car_s-car_s) < 30) {
                   change_lane_left = false;
                 }
               }
             }
+            // Current vehicle being processed is in middle lane
             else if (lane_other == 1) {
+              // I'm in same lane check distance and possibly set flag to slow down
               if (lane == lane_other) {
                 if ((check_car_s > car_s) && ((check_car_s-car_s) < 30)) {
                   slow_down = true;
                 }
               }
+              // I'm in left lane - check if vehicle is too close to me to change to middle lane
               else if (lane == 0) {
+                // Can't change lanes left if currently in left lane
                 change_lane_left = false;
                 if (abs(check_car_s-car_s) < 30) {
                   change_lane_right = false;
                 }
               }
+              // I'm in right lane - check if vehicle is too close to me to change to middle lane
               else if (lane == 2) {
+                // Can't change lanes right is currently in right lane
                 change_lane_right = false;
                 if (abs(check_car_s-car_s) < 30) {
                   change_lane_left = false;
                 }
               }
             }
+            // Current vehicle being processed is in right lane
             else if (lane_other == 2) {
+              // I'm in same lane check distance and possibly set flag to slow down
               if (lane == lane_other) {
+                // Can't change lanes right is currently in right lane
+                change_lane_right = false;
                 if ((check_car_s > car_s) && ((check_car_s-car_s) < 30)) {
                   slow_down = true;
                 }
               }
+              // I'm in middle lane - check if vehicle is too close to me to change to right lane
               else if (lane == 1) {
                 if (abs(check_car_s-car_s) < 30) {
                   change_lane_right = false;
@@ -305,17 +321,21 @@ int main() {
             }
           }
 
+          // If slow_down flag has been set, take appropriate action
           if (slow_down) {
+            // First check if we are able to change lanes instead of slowing down
             if (change_lane_left) {
               lane -= 1;
             }
             else if (change_lane_right) {
               lane += 1;
             }
+            // If we can't change lanes, then decrease velocity
             else {
               ref_vel -= .224;
             }
           }
+          // If slow_down flag isn't set and we are traveling below speed limit, increase velocity
           else if (ref_vel < 49.5) {
             ref_vel += .224;
           }
@@ -416,7 +436,6 @@ int main() {
             // Rotate back to normal after rotating previously
             x_point = (x_ref*cos(ref_yaw)-y_ref*sin(ref_yaw));
             y_point = (x_ref*sin(ref_yaw)+y_ref*cos(ref_yaw));
-
             x_point += ref_x;
             y_point += ref_y;
 
